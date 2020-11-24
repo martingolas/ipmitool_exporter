@@ -220,7 +220,7 @@ func ipmitoolConfig(config IPMIConfig) []string {
 		args = append(args, "-P", config.Password)
 	}
 	if config.Timeout != 0 {
-		args = append(args, "-N", strconv.FormatInt(config.Timeout, 36))
+		args = append(args, "-N", strconv.FormatInt(config.Timeout, 10))
 	}
 	if config.Cipher != 0 {
 		args = append(args, "-C", strconv.FormatInt(config.Cipher, 10))
@@ -250,9 +250,10 @@ func ipmitoolOutput(target ipmiTarget, command string) (string, error) {
 
 	cmdConfig = append(cmdConfig, "-H", target.host)
 	cmdConfig = append(cmdConfig, cmdCommand...)
-	log.Debugf("cmd config:", cmdConfig)
+	log.Debugf("cmd config: %s", cmdConfig)
 	cmd := exec.Command("ipmitool", cmdConfig...)
 	var outBuf bytes.Buffer
+	log.Debugf("outbuf length %d", outBuf.Len())
 	cmd.Stdout = &outBuf
 	cmd.Stderr = &outBuf
 	err := cmd.Run()
@@ -268,7 +269,7 @@ func ipmitoolOutput(target ipmiTarget, command string) (string, error) {
 				}
 			}
 		} else {
-			log.Fatal(err)
+			log.Fatal("ipmitool failed: %s, %s", err, outBuf.String())
 		}
 	}
 	return outBuf.String(), err
@@ -290,7 +291,7 @@ func splitSensorOutput(impitoolOutput string) ([]sensorData, error) {
 			data.Name = splittedL[0]
 			valueS := splittedL[1]
 			convValueS, convErr := strconv.ParseUint(valueS, 0, 64)
-			if valueS != "na" && convErr != nil {	
+			if valueS != "na" && convErr != nil {
 				data.Value, err = strconv.ParseFloat(valueS, 64)
 				if err != nil {
 					continue
