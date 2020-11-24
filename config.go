@@ -30,7 +30,9 @@ type IPMIConfig struct {
 	User             string   `yaml:"user"`
 	Password         string   `yaml:"pass"`
 	Privilege        string   `yaml:"privilege"`
-	Timeout          int64   `yaml:"timeout"`
+	Cipher           int64    `yaml:"cipher_suite"`
+	Interface        string   `yaml:"interface"`
+	Timeout          int64    `yaml:"timeout"`
 	Collectors       []string `yaml:"collectors"`
 
 	// Catches all undefined fields and must be empty after parsing.

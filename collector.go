@@ -222,6 +222,12 @@ func ipmitoolConfig(config IPMIConfig) []string {
 	if config.Timeout != 0 {
 		args = append(args, "-N", strconv.FormatInt(config.Timeout, 36))
 	}
+	if config.Cipher != 0 {
+		args = append(args, "-C", strconv.FormatInt(config.Cipher, 10))
+	}
+	if config.Interface != "" {
+		args = append(args, "-I", config.Interface)
+	}
 	return args
 }
 
@@ -244,7 +250,7 @@ func ipmitoolOutput(target ipmiTarget, command string) (string, error) {
 
 	cmdConfig = append(cmdConfig, "-H", target.host)
 	cmdConfig = append(cmdConfig, cmdCommand...)
-
+	log.Debugf("cmd config:", cmdConfig)
 	cmd := exec.Command("ipmitool", cmdConfig...)
 	var outBuf bytes.Buffer
 	cmd.Stdout = &outBuf
